@@ -1,7 +1,6 @@
 from django.contrib import admin
 from django.contrib.admin import SimpleListFilter
-
-from .models import Person
+from django.contrib.auth.models import User
 
 
 # Register your models here.
@@ -26,10 +25,9 @@ class EmailFilter(admin.SimpleListFilter):
             return queryset.filter(email='')
 
 
-@admin.register(Person)
-class PersonAdmin(admin.ModelAdmin):
-    list_display = ('id', 'last_name', 'first_name', 'gender', 'email',
-                    'date_created')
-    list_filter = ('gender', EmailFilter)
+class CustomUserAdmin(admin.ModelAdmin):
+    list_display = ('id', 'username', 'last_name', 'first_name', 'email',
+                    'is_staff', 'date_joined')
+    list_filter = ('is_staff', EmailFilter)
     ordering = ('-last_name', )
-    search_fields = ['last_name', 'first_name']
+    search_fields = ['username']
