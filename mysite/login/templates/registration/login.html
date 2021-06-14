@@ -4,11 +4,14 @@
 
 {% block content %}
 	<form method="POST">
+		{% csrf_token %}
 		<p>{{ login_form.username.label }}</p>
 		<p>{{ login_form.username }}</p>
 
 		<p>{{ login_form.password.label }}</p>
 		<p>{{ login_form.password }}</p>
+		
 		<input type="submit" value="Sign in">
 	</form>
+	<p><a href="{% url 'register' %}">Create an account</a></p>
 {% endblock %}

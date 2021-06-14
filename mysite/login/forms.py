@@ -1,5 +1,6 @@
 from django import forms
 from django.contrib.auth.models import User
+from django.contrib import messages
 
 
 class RegisterForm(forms.ModelForm):
@@ -13,7 +14,23 @@ class RegisterForm(forms.ModelForm):
         model = User
         fields = ['username', 'email']
 
-    def validate_password(self):
+    def clean_email(self):
+        """Check if email already exists."""
+
+        email = self.cleaned_data['email']
+        if User.objects.filter(email=email).exists():
+            raise forms.ValidationError('Email already exists')
+
+    def clean_username(self):
+        """Checks if username already exists within the database."""
+
+        username = self.cleaned_data['username']
+        if User.objects.filter(username=username).exists():
+            raise forms.ValidationError('Username already exists')
+
+        return username
+
+    def clean_password2(self):
         """Validates password and confirmation password."""
 
         cd = self.cleaned_data
@@ -25,4 +42,4 @@ class RegisterForm(forms.ModelForm):
 
 class LoginForm(forms.Form):
     username = forms.CharField(max_length=20)
-    password = forms.CharField(max_length=20)
+    password = forms.CharField(label='Password', widget=forms.PasswordInput)

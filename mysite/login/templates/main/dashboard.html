@@ -3,5 +3,6 @@
 {% block title %}Dashboard{% endblock %}
 
 {% block content %}
-	<h1>Welcome{{ new_user.username }}</h1>
+	<h1>Welcome {{ user.username }}</h1>
+	<p><a href="{% url 'logout' %}">Logout</a></p>
 {% endblock %}

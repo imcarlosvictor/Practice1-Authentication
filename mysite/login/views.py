@@ -1,23 +1,30 @@
 from django.shortcuts import render
-from django.contrib.auth import authenticate, login
+from django.http import HttpResponse
+from django.contrib.auth import authenticate, login, logout
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 
 from .forms import LoginForm, RegisterForm
 
 
 # Create your views here.
 def login_request(request):
-    if request.method == "POST":
-        login_form = LoginForm()
+    if request.method == 'POST':
+        login_form = LoginForm(request.POST)
         if login_form.is_valid():
             cd = login_form.cleaned_data
             user = authenticate(request,
                                 username=cd['username'],
                                 password=cd['password'])
             if user is not None:
-                login(request, user)
-                return render(request, 'main/dashboard.html')
+                if user.is_active:
+                    login(request, user)
+                    return render(request, 'main/dashboard.html',
+                                  {'user': user})
+                else:
+                    return HttpResponse('Disabled account')
             else:
-                pass
+                return HttpResponse('Invalid login')
     else:
         login_form = LoginForm()
 
@@ -25,28 +32,27 @@ def login_request(request):
                   {"login_form": login_form})
 
 
-def logout_request(request):
-    pass
-
-
 def register(request):
     if request.method == "POST":
         register_form = RegisterForm(request.POST)
         if register_form.is_valid():
             # Create new user but don't save just yet
-            new_user = register_form.save(commit=False)
+            user = register_form.save(commit=False)
             # Set user password
-            new_user.set_password(register_form.cleaned_data['password2'])
+            user.set_password(register_form.cleaned_data['password'])
             # Save user
-            new_user.save()
-            return render(request, 'main/dashboard.html',
-                          {'new_user': new_user})
+            user.save()
+            # Success message
+            messages.success(request, 'Account created')
+            return render(request, 'main/dashboard.html', {'user': user})
     else:
+        messages.error(request, 'Account not valid')
         register_form = RegisterForm()
 
     return render(request, 'registration/register.html',
                   {'register_form': register_form})
 
 
+@login_required
 def dashboard(request):
-    pass
+    return render(request, 'main/dashboard.html')
