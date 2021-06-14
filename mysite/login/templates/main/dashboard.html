@@ -4,5 +4,8 @@
 
 {% block content %}
 	<h1>Welcome {{ user.username }}</h1>
+	{% for message in messages %}
+		<p>{{ message }}</p>
+	{% endfor %}
 	<p><a href="{% url 'logout' %}">Logout</a></p>
 {% endblock %}

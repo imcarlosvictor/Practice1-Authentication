@@ -24,12 +24,12 @@ def login_request(request):
                 else:
                     return HttpResponse('Disabled account')
             else:
-                return HttpResponse('Invalid login')
+                messages.error(request, 'Invalid login')
     else:
         login_form = LoginForm()
 
-    return render(request, 'registration/login.html',
-                  {"login_form": login_form})
+    context = {'login_form': login_form}
+    return render(request, 'registration/login.html', context)
 
 
 def register(request):
@@ -43,14 +43,15 @@ def register(request):
             # Save user
             user.save()
             # Success message
-            messages.success(request, 'Account created')
-            return render(request, 'main/dashboard.html', {'user': user})
+            context = {'user': user}
+            return render(request, 'main/dashboard.html', context)
+        else:
+            messages.error(request, 'Account invalid')
     else:
-        messages.error(request, 'Account not valid')
         register_form = RegisterForm()
 
-    return render(request, 'registration/register.html',
-                  {'register_form': register_form})
+    context = {'register_form': register_form}
+    return render(request, 'registration/register.html', context)
 
 
 @login_required

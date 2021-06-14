@@ -21,12 +21,15 @@ class RegisterForm(forms.ModelForm):
         if User.objects.filter(email=email).exists():
             raise forms.ValidationError('Email already exists')
 
+        return email
+
     def clean_username(self):
         """Checks if username already exists within the database."""
 
+        # username = self.cleaned_data.get('username')
         username = self.cleaned_data['username']
         if User.objects.filter(username=username).exists():
-            raise forms.ValidationError('Username already exists')
+            raise forms.ValidationError('Username is taken')
 
         return username
 
